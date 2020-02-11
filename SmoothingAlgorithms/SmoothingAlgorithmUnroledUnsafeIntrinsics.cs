@@ -26,12 +26,8 @@ namespace SmoothingAlgorithms
                     valueCurrent++;
                 }
 
-                var aPrev = aStart;
                 var aCurrent = aStart + 1;
                 var aEnd = aStart + resultSize;
-                var aIntrinsics = aPrev;
-
-                *aPrev = sum;
 
                 var resultSizeUnroled = ((resultSize - 1) >> 1) << 1;
                 var aUnrolledEnd = aStart + resultSizeUnroled;
@@ -51,8 +47,7 @@ namespace SmoothingAlgorithms
 
                     Sse2.Store(
                         aCurrent, 
-                        Sse2.Divide(
-                           
+                        Sse2.Divide(                           
                             Sse2.Subtract( 
                                 Sse2.LoadVector128(valueEndwindowSize) , 
                                 Sse2.LoadVector128(valueCurrent)),
@@ -73,31 +68,24 @@ namespace SmoothingAlgorithms
                     valueWindowSize++;
                 }
 
-                aPrev = aStart;
+                var aPrev = aStart;
                 aCurrent = aStart + 1;
                 aEnd = aStart + resultSize;
-                aIntrinsics = aPrev;
 
                 *aPrev = sum / windowSize;
 
                 resultSizeUnroled = ((resultSize - 1) >> 1) << 1;
                 aUnrolledEnd = aStart + resultSizeUnroled;
 
-                valueCurrent = valueStart;
-
-                valueWindowSize = valueStart + windowSize;
-
                 while(aCurrent < aUnrolledEnd)
                 {
                     // 1
                     *aCurrent += *aPrev;
-
                     aCurrent++;
                     aPrev++;
 
                     // 2
-                    *aCurrent += *aPrev ;
-
+                    *aCurrent += *aPrev;
                     aCurrent++;
                     aPrev++;
                 }
