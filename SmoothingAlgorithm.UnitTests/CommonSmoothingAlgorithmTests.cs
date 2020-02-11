@@ -1,6 +1,7 @@
 using SmoothingAlgorithms;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace SmoothingAlgorithm.UnitTests
 {
@@ -22,6 +23,11 @@ namespace SmoothingAlgorithm.UnitTests
             var result =_smoothingAlgorithm.Applay(signal, halfWindow);
 
             //Assert
+            for(var i = 0; i < result.Length; i++)
+            {
+                result[i] = Math.Round(result[i], 2);
+            }
+
             CollectionAssert.AreEqual(expectedResult, result);
         }
 

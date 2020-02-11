@@ -19,6 +19,7 @@ namespace SmoothingAlgorithms
 
                 var valueCurrent = valueStart;
                 var valueEndwindowSize = valueCurrent + windowSize;
+
                 while(valueCurrent < valueEndwindowSize)
                 {
                     sum += *valueCurrent;
@@ -39,69 +40,74 @@ namespace SmoothingAlgorithms
 
                 var valueWindowSize = valueStart + windowSize;
 
-                var pWindowsSize = stackalloc double[2];
+                valueCurrent = valueStart;
+                valueEndwindowSize = valueCurrent + windowSize;
 
-                pWindowsSize[0] = windowSize;
-                pWindowsSize[1] = windowSize;
-
-                var vWindowsSize = Sse2.LoadVector128(pWindowsSize);
+                var pWindowSize = stackalloc double[2] {windowSize, windowSize};
+                var vWindowSize = Sse2.LoadVector128(pWindowSize);
 
                 while(aCurrent < aUnrolledEnd)
                 {
-                    // 1
-                    *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
-                    //*aPrev /= windowSize;
-                    aCurrent++;
-                    aPrev++;
-                    valueCurrent++;
-                    valueWindowSize++;
-
-                    // 2
-                    *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
-                    //*aPrev /= windowSize;
-                    aCurrent++;
-                    aPrev++;
-                    valueCurrent++;
-                    valueWindowSize++;
 
                     Sse2.Store(
-                        aIntrinsics, 
-                        Sse2.Divide( 
-                            Sse2.LoadVector128(aIntrinsics) , 
-                            vWindowsSize)
+                        aCurrent, 
+                        Sse2.Divide(
+                           
+                            Sse2.Subtract( 
+                                Sse2.LoadVector128(valueEndwindowSize) , 
+                                Sse2.LoadVector128(valueCurrent)),
+                                vWindowSize
+                        )
                     );
 
-                    aIntrinsics = aPrev;
-                    // 3
-                    /*
-                    *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
-                    *aPrev /= windowSize;
-                    aCurrent++;
-                    aPrev++;
-                    valueCurrent++;
-                    valueWindowSize++;
-                    */
-                    // 4
-                    /*
-                    *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
-                    *aPrev /= windowSize;
-                    aCurrent++;
-                    aPrev++;
-                    valueCurrent++;
-                    valueWindowSize++;*/
+                    valueEndwindowSize += 2;
+                    valueCurrent += 2;
+                    aCurrent += 2;
                 }
 
                 while(aCurrent < aEnd)
                 {
-                    *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
-                    *aPrev /= windowSize;
+                    *aCurrent = (*valueEndwindowSize - *valueCurrent) /windowSize;
                     aCurrent++;
-                    aPrev++;
                     valueCurrent++;
                     valueWindowSize++;
                 }
 
-                *aPrev /= (windowSize);
+                aPrev = aStart;
+                aCurrent = aStart + 1;
+                aEnd = aStart + resultSize;
+                aIntrinsics = aPrev;
+
+                *aPrev = sum / windowSize;
+
+                resultSizeUnroled = ((resultSize - 1) >> 1) << 1;
+                aUnrolledEnd = aStart + resultSizeUnroled;
+
+                valueCurrent = valueStart;
+
+                valueWindowSize = valueStart + windowSize;
+
+                while(aCurrent < aUnrolledEnd)
+                {
+                    // 1
+                    *aCurrent += *aPrev;
+
+                    aCurrent++;
+                    aPrev++;
+
+                    // 2
+                    *aCurrent += *aPrev ;
+
+                    aCurrent++;
+                    aPrev++;
+                }
+
+                while(aCurrent < aEnd)
+                {
+                    *aCurrent += *aPrev;
+                    aCurrent++;
+                    aPrev++;
+                }
             }
 
             return a;
