@@ -22,50 +22,75 @@ namespace SmoothingAlgorithms
 
                 while(valueCurrent < valueEndwindowSize)
                 {
-                    sum += *valueCurrent;
-                    valueCurrent++;
+                    sum += *(valueCurrent++);
                 }
 
                 var aCurrent = aStart + 1;
                 var aEnd = aStart + resultSize;
 
-                var resultSizeUnroled = ((resultSize - 1) >> 1) << 1;
-                var aUnrolledEnd = aStart + resultSizeUnroled;
+                var aUnrolledEnd = aStart + (((resultSize - 1) >> 3) << 3);
 
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
-
-                valueCurrent = valueStart;
-                valueEndwindowSize = valueCurrent + windowSize;
 
                 var pWindowSize = stackalloc double[2] {windowSize, windowSize};
                 var vWindowSize = Sse2.LoadVector128(pWindowSize);
 
                 while(aCurrent < aUnrolledEnd)
                 {
-
+                    // 1
                     Sse2.Store(
                         aCurrent, 
                         Sse2.Divide(                           
                             Sse2.Subtract( 
-                                Sse2.LoadVector128(valueEndwindowSize) , 
+                                Sse2.LoadVector128(valueWindowSize) , 
                                 Sse2.LoadVector128(valueCurrent)),
                                 vWindowSize
                         )
                     );
 
-                    valueEndwindowSize += 2;
-                    valueCurrent += 2;
-                    aCurrent += 2;
+                    // 2
+                    Sse2.Store(
+                        aCurrent + 2, 
+                        Sse2.Divide(                           
+                            Sse2.Subtract( 
+                                Sse2.LoadVector128(valueWindowSize + 2) , 
+                                Sse2.LoadVector128(valueCurrent + 2)),
+                                vWindowSize
+                        )
+                    );    
+
+                    // 3
+                    Sse2.Store(
+                        aCurrent + 4, 
+                        Sse2.Divide(                           
+                            Sse2.Subtract( 
+                                Sse2.LoadVector128(valueWindowSize + 4) , 
+                                Sse2.LoadVector128(valueCurrent + 4)),
+                                vWindowSize
+                        )
+                    ); 
+
+                    // 4
+                    Sse2.Store(
+                        aCurrent + 6, 
+                        Sse2.Divide(                           
+                            Sse2.Subtract( 
+                                Sse2.LoadVector128(valueWindowSize + 6) , 
+                                Sse2.LoadVector128(valueCurrent + 6)),
+                                vWindowSize
+                        )
+                    ); 
+
+                    valueWindowSize += 8;
+                    valueCurrent += 8;
+                    aCurrent += 8;
                 }
 
                 while(aCurrent < aEnd)
                 {
-                    *aCurrent = (*valueEndwindowSize - *valueCurrent) /windowSize;
-                    aCurrent++;
-                    valueCurrent++;
-                    valueWindowSize++;
+                    *(aCurrent++) = (*(valueWindowSize++) - *(valueCurrent++)) /windowSize;
                 }
 
                 var aPrev = aStart;
@@ -74,32 +99,24 @@ namespace SmoothingAlgorithms
 
                 *aPrev = sum / windowSize;
 
-                resultSizeUnroled = ((resultSize - 1) >> 1) << 1;
-                aUnrolledEnd = aStart + resultSizeUnroled;
+                aUnrolledEnd = aStart + (((resultSize - 1) >> 1) << 1);
 
                 while(aCurrent < aUnrolledEnd)
                 {
                     // 1
-                    *aCurrent += *aPrev;
-                    aCurrent++;
-                    aPrev++;
+                    *(aCurrent++) += *(aPrev++);
 
                     // 2
-                    *aCurrent += *aPrev;
-                    aCurrent++;
-                    aPrev++;
+                    *(aCurrent++) += *(aPrev++);
                 }
 
                 while(aCurrent < aEnd)
                 {
-                    *aCurrent += *aPrev;
-                    aCurrent++;
-                    aPrev++;
+                    *(aCurrent++) += *(aPrev++);
                 }
             }
 
             return a;
         }
     }
-
 }

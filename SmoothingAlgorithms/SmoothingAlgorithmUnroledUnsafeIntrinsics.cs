@@ -36,9 +36,6 @@ namespace SmoothingAlgorithms
 
                 var valueWindowSize = valueStart + windowSize;
 
-                valueCurrent = valueStart;
-                valueEndwindowSize = valueCurrent + windowSize;
-
                 var pWindowSize = stackalloc double[2] {windowSize, windowSize};
                 var vWindowSize = Sse2.LoadVector128(pWindowSize);
 
@@ -49,20 +46,20 @@ namespace SmoothingAlgorithms
                         aCurrent, 
                         Sse2.Divide(                           
                             Sse2.Subtract( 
-                                Sse2.LoadVector128(valueEndwindowSize) , 
+                                Sse2.LoadVector128(valueWindowSize) , 
                                 Sse2.LoadVector128(valueCurrent)),
                                 vWindowSize
                         )
                     );
 
-                    valueEndwindowSize += 2;
+                    valueWindowSize += 2;
                     valueCurrent += 2;
                     aCurrent += 2;
                 }
 
                 while(aCurrent < aEnd)
                 {
-                    *aCurrent = (*valueEndwindowSize - *valueCurrent) /windowSize;
+                    *aCurrent = (*valueWindowSize - *valueCurrent) /windowSize;
                     aCurrent++;
                     valueCurrent++;
                     valueWindowSize++;

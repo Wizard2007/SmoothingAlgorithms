@@ -18,7 +18,7 @@ namespace SmoothingAlgorithmBenchmarks
         [ParamsSource(nameof(Buffers))]
         public int N { get; set; }
 
-        public IEnumerable<int> Buffers => new[] { 280000, 350000 };
+        public IEnumerable<int> Buffers => new[] { 280000, 350000, 2800000, 3500000 };
 
         
         [ParamsSource(nameof(HalfWindows))]
