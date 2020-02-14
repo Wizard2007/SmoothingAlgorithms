@@ -3,7 +3,8 @@ using System.Runtime.Intrinsics.X86;
 
 namespace SmoothingAlgorithms
 {
-    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolled : CommonSmoothingAlgorithm
+
+    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledAvx2 : CommonSmoothingAlgorithm
     {
         public unsafe override double[] Applay(double[] values, int halfWindow)
         {
@@ -12,9 +13,9 @@ namespace SmoothingAlgorithms
 
             if (resultSize == 0) return null;
 
-            var a = new double[resultSize];
-            
+            var a = new double[resultSize];            
             var sum = 0d;
+
             fixed(double* valueStart = values, aStart = a)
             {
 
@@ -29,64 +30,74 @@ namespace SmoothingAlgorithms
 
                 var aCurrent = aStart + 1;
                 var aEnd = aStart + resultSize;
-
-                var resultSizeUnroled = ((resultSize - 1) >> 3) << 3;
-                var aUnrolledEnd = aStart + resultSizeUnroled;
+                var aUnrolledEnd = aStart + (((resultSize - 1) >> 4) << 4);
 
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
-                var vWindowSize = Vector128.Create(windowSize, windowSize).AsDouble();
+                var vWindowSize = Vector256.Create(windowSize, windowSize, windowSize, windowSize).AsDouble();
 
                 while(aCurrent < aUnrolledEnd)
                 {
-                    // 1
-                    Sse2.Store(
+                    #region  1
+
+                    Avx2.Store(
                         aCurrent, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize) , 
-                                Sse2.LoadVector128(valueCurrent)),
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize) , 
+                                Avx2.LoadVector256(valueCurrent)),
                                 vWindowSize
                         )
                     );
 
-                    // 2
-                    Sse2.Store(
-                        aCurrent + 2, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize + 2) , 
-                                Sse2.LoadVector128(valueCurrent + 2)),
+                    #endregion
+
+                    #region  2
+
+                    Avx2.Store(
+                        aCurrent + 4, 
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize + 4) , 
+                                Avx2.LoadVector256(valueCurrent + 4)),
                                 vWindowSize
                         )
                     );    
 
-                    // 3
-                    Sse2.Store(
-                        aCurrent + 4, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize + 4) , 
-                                Sse2.LoadVector128(valueCurrent + 4)),
+                    #endregion
+
+                    #region  3
+
+                    Avx2.Store(
+                        aCurrent + 8, 
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize + 8) , 
+                                Avx2.LoadVector256(valueCurrent + 8)),
                                 vWindowSize
                         )
                     ); 
 
-                    // 4
-                    Sse2.Store(
-                        aCurrent + 6, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize + 6) , 
-                                Sse2.LoadVector128(valueCurrent + 6)),
+                    #endregion
+
+                    #region  4
+
+                    Avx2.Store(
+                        aCurrent + 12, 
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize + 12) , 
+                                Avx2.LoadVector256(valueCurrent + 12)),
                                 vWindowSize
                         )
                     ); 
 
-                    valueWindowSize += 8;
-                    valueCurrent += 8;
-                    aCurrent += 8;
+                    #endregion 
+
+                    valueWindowSize += 16;
+                    valueCurrent += 16;
+                    aCurrent += 16;
                 }
 
                 while(aCurrent < aEnd)
@@ -103,30 +114,41 @@ namespace SmoothingAlgorithms
 
                 *aPrev = sum / windowSize;
 
-                resultSizeUnroled = ((resultSize - 1) >> 2) << 2;
-                aUnrolledEnd = aStart + resultSizeUnroled;
+                aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2);
 
                 while(aCurrent < aUnrolledEnd)
                 {
-                    // 1
+                    #region  1
+
                     *aCurrent += *aPrev;
                     aCurrent++;
                     aPrev++;
 
-                    // 2
+                    #endregion
+
+                    #region  2
+
                     *aCurrent += *aPrev;
                     aCurrent++;
                     aPrev++;
 
-                    // 3
+                    #endregion
+
+                    #region  3
+
                     *aCurrent += *aPrev;
                     aCurrent++;
                     aPrev++;
 
-                    // 4
+                    #endregion
+
+                    #region  4
+
                     *aCurrent += *aPrev;
                     aCurrent++;
                     aPrev++;
+
+                    #endregion                    
                 }
 
                 while(aCurrent < aEnd)

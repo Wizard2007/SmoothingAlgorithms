@@ -2,7 +2,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace SmoothingAlgorithms
 {
-    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledPP : CommonSmoothingAlgorithm
+    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledPPAvx2 : CommonSmoothingAlgorithm
     {
         public unsafe override double[] Applay(double[] values, int halfWindow)
         {
@@ -28,64 +28,64 @@ namespace SmoothingAlgorithms
                 var aCurrent = aStart + 1;
                 var aEnd = aStart + resultSize;
 
-                var aUnrolledEnd = aStart + (((resultSize - 1) >> 3) << 3);
+                var aUnrolledEnd = aStart + (((resultSize - 1) >> 4) << 4);
 
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
 
-                var pWindowSize = stackalloc double[2] {windowSize, windowSize};
-                var vWindowSize = Sse2.LoadVector128(pWindowSize);
+                var pWindowSize = stackalloc double[4] {windowSize, windowSize, windowSize, windowSize};
+                var vWindowSize = Avx2.LoadVector256(pWindowSize);
 
                 while(aCurrent < aUnrolledEnd)
                 {
                     // 1
-                    Sse2.Store(
+                    Avx2.Store(
                         aCurrent, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize) , 
-                                Sse2.LoadVector128(valueCurrent)),
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize) , 
+                                Avx2.LoadVector256(valueCurrent)),
                                 vWindowSize
                         )
                     );
 
                     // 2
-                    Sse2.Store(
-                        aCurrent + 2, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize + 2) , 
-                                Sse2.LoadVector128(valueCurrent + 2)),
+                    Avx2.Store(
+                        aCurrent + 4, 
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize + 4) , 
+                                Avx2.LoadVector256(valueCurrent + 4)),
                                 vWindowSize
                         )
                     );    
 
                     // 3
-                    Sse2.Store(
-                        aCurrent + 4, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize + 4) , 
-                                Sse2.LoadVector128(valueCurrent + 4)),
+                    Avx2.Store(
+                        aCurrent + 8, 
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize + 8) , 
+                                Avx2.LoadVector256(valueCurrent + 8)),
                                 vWindowSize
                         )
                     ); 
 
                     // 4
-                    Sse2.Store(
-                        aCurrent + 6, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize + 6) , 
-                                Sse2.LoadVector128(valueCurrent + 6)),
+                    Avx2.Store(
+                        aCurrent + 12, 
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize + 12) , 
+                                Avx2.LoadVector256(valueCurrent + 12)),
                                 vWindowSize
                         )
                     ); 
 
-                    valueWindowSize += 8;
-                    valueCurrent += 8;
-                    aCurrent += 8;
+                    valueWindowSize += 16;
+                    valueCurrent += 16;
+                    aCurrent += 16;
                 }
 
                 while(aCurrent < aEnd)

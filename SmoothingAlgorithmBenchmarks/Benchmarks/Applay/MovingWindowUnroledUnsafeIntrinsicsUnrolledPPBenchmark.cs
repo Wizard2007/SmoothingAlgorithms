@@ -2,7 +2,6 @@
 using SmoothingAlgorithmBenchmarks.Configs;
 using SmoothingAlgorithms;
 
-
 namespace SmoothingAlgorithmBenchmarks
 {
     [Config(typeof(CommonApplayConfig))]

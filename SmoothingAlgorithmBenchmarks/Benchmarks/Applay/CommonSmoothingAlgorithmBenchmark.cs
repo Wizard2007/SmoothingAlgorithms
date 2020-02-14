@@ -18,13 +18,13 @@ namespace SmoothingAlgorithmBenchmarks
         [ParamsSource(nameof(Buffers))]
         public int N { get; set; }
 
-        public IEnumerable<int> Buffers => new[] { 280000, 350000, 2800000, 3500000 };
+        public IEnumerable<int> Buffers => new[] { /*2800, 3500, 28000, 35000,*/ 280000, 350000 };
 
         
         [ParamsSource(nameof(HalfWindows))]
         public int HalfWindow { get; set; }
 
-        public IEnumerable<int> HalfWindows => new[] { 2, 7, 12, 15, 20 };
+        public IEnumerable<int> HalfWindows => new[] { 7, 15, 20 };
 
         #endregion
 

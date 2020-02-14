@@ -2,8 +2,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace SmoothingAlgorithms
 {
-
-    public class SmoothingAlgorithmUnroledUnsafeIntrinsics : CommonSmoothingAlgorithm
+    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsAvx2 : CommonSmoothingAlgorithm
     {
         public unsafe override double[] Applay(double[] values, int halfWindow)
         {
@@ -30,32 +29,32 @@ namespace SmoothingAlgorithms
                 var aCurrent = aStart + 1;
                 var aEnd = aStart + resultSize;
 
-                var resultSizeUnroled = ((resultSize - 1) >> 1) << 1;
+                var resultSizeUnroled = ((resultSize - 1) >> 2) << 2;
                 var aUnrolledEnd = aStart + resultSizeUnroled;
 
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
 
-                var pWindowSize = stackalloc double[2] {windowSize, windowSize};
-                var vWindowSize = Sse2.LoadVector128(pWindowSize);
+                var pWindowSize = stackalloc double[4] {windowSize, windowSize, windowSize, windowSize};
+                var vWindowSize = Avx2.LoadVector256(pWindowSize);
 
                 while(aCurrent < aUnrolledEnd)
                 {
 
-                    Sse2.Store(
+                    Avx2.Store(
                         aCurrent, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize) , 
-                                Sse2.LoadVector128(valueCurrent)),
+                        Avx2.Divide(                           
+                            Avx2.Subtract( 
+                                Avx2.LoadVector256(valueWindowSize) , 
+                                Avx2.LoadVector256(valueCurrent)),
                                 vWindowSize
                         )
                     );
 
-                    valueWindowSize += 2;
-                    valueCurrent += 2;
-                    aCurrent += 2;
+                    valueWindowSize += 4;
+                    valueCurrent += 4;
+                    aCurrent += 4;
                 }
 
                 while(aCurrent < aEnd)
