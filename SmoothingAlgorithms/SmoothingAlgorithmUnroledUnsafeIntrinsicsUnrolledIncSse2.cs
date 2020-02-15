@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
@@ -29,53 +30,42 @@ namespace SmoothingAlgorithms
 
                 var aCurrent = aStart + 1;
                 var aEnd = aStart + resultSize;
-                var aUnrolledEnd = aStart + (((resultSize - 1) >> 4) << 4);
+                var aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2);
 
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
-                var vWindowSize = Vector256.Create(
-                    (double)windowSize, 
-                    (double)windowSize, 
+                var vWindowSize = Vector128.Create(
                     (double)windowSize, 
                     (double)windowSize);
 
-                var vCurrent = Vector256.Create(
-                    (ulong)aCurrent, 
-                    (ulong)aCurrent+sizeof(double), 
-                    (ulong)aCurrent+2*sizeof(double), 
-                    (ulong)aCurrent+3*sizeof(double));
+                Vector128<Int64> vCurrent = Vector128.Create(
+                    (Int64)aCurrent, 
+                    (Int64)aCurrent+2*sizeof(double));
 
-                var vValueCurrent = Vector256.Create(
-                    (ulong)valueCurrent, 
-                    (ulong)valueCurrent+2*sizeof(double), 
-                    (ulong)valueCurrent+4*sizeof(double), 
-                    (ulong)valueCurrent+6*sizeof(double));
+                var vValueCurrent = Vector128.Create(
+                    (Int64)valueCurrent, 
+                    (Int64)valueCurrent+2*sizeof(double));
 
 
-                var vValueWindowSize = Vector256.Create(
-                    (ulong)valueWindowSize, 
-                    (ulong)valueWindowSize+2*sizeof(double), 
-                    (ulong)valueWindowSize+4*sizeof(double), 
-                    (ulong)valueWindowSize+6*sizeof(double));                   
+                var vValueWindowSize = Vector128.Create(
+                    (Int64)valueWindowSize, 
+                    (Int64)valueWindowSize+2*sizeof(double));                   
                 
-                var vShiftIndex1 = Vector256.Create(
-                    8*sizeof(double), 
-                    8*sizeof(double), 
-                    8*sizeof(double), 
-                    8*sizeof(double)
-                    );
+                var vShiftIndex1 = Vector128.Create(
+                    4*sizeof(double), 
+                    4*sizeof(double));
 
                 while(aCurrent < aUnrolledEnd)
                 {
                     #region  1
 
-                    Avx.Store(
+                    Sse2.Store(
                         aCurrent, 
-                        Avx.Divide(                           
-                            Avx.Subtract( 
-                                Avx.LoadVector256(valueWindowSize) , 
-                                Avx.LoadVector256(valueCurrent)),
+                        Sse2.Divide(                           
+                            Sse2.Subtract( 
+                                Sse2.LoadVector128(valueWindowSize) , 
+                                Sse2.LoadVector128(valueCurrent)),
                                 vWindowSize
                         )
                     );
@@ -84,49 +74,21 @@ namespace SmoothingAlgorithms
 
                     #region  2
 
-                    Avx.Store(
+                    Sse2.Store(
                         (double*)vCurrent.GetElement(1), 
-                        Avx.Divide(                           
-                            Avx.Subtract( 
-                                Avx.LoadVector256((double*)vValueWindowSize.GetElement(1)) , 
-                                Avx.LoadVector256((double*)vValueCurrent.GetElement(1))),
+                        Sse2.Divide(                           
+                            Sse2.Subtract( 
+                                Sse2.LoadVector128((double*)vValueWindowSize.GetElement(1)) , 
+                                Sse2.LoadVector128((double*)vValueCurrent.GetElement(1))),
                                 vWindowSize
                         )
                     );    
 
                     #endregion
 
-                    #region  3
-
-                    Avx.Store(
-                        (double*)vCurrent.GetElement(2), 
-                        Avx.Divide(                           
-                            Avx.Subtract( 
-                                Avx.LoadVector256((double*)vValueWindowSize.GetElement(2)) , 
-                                Avx.LoadVector256((double*)vValueCurrent.GetElement(2))),
-                                vWindowSize
-                        )
-                    ); 
-
-                    #endregion
-
-                    #region  4
-
-                    Avx.Store(
-                        (double*)vCurrent.GetElement(3), 
-                        Avx.Divide(                           
-                            Avx.Subtract( 
-                                Avx.LoadVector256((double*)vValueWindowSize.GetElement(3)) , 
-                                Avx.LoadVector256((double*)vValueCurrent.GetElement(3))),
-                                vWindowSize
-                        )
-                    );
-
-                    #endregion 
-
-                    vCurrent = Avx.Add(vCurrent.AsDouble(),vShiftIndex1.AsDouble()).AsUInt64();
-                    vValueCurrent = Avx.Add(vValueCurrent.AsDouble(),vShiftIndex1.AsDouble()).AsUInt64();
-                    vValueWindowSize = Avx.Add(vValueWindowSize.AsDouble(),vShiftIndex1.AsDouble()).AsUInt64();
+                    vCurrent = Sse41.Add(vCurrent,vShiftIndex1);
+                    vValueCurrent = Sse2.Add(vValueCurrent,vShiftIndex1);
+                    vValueWindowSize = Sse2.Add(vValueWindowSize,vShiftIndex1);
 
                     valueWindowSize = (double*)vValueWindowSize.GetElement(0);
                     valueCurrent = (double*)vValueCurrent.GetElement(0);
@@ -150,23 +112,17 @@ namespace SmoothingAlgorithms
                 aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2);
                 //var s = sizeof(double*);
                 //var addr = (long)aCurrent;
-                vCurrent = Vector256.Create(
-                    (ulong)aCurrent, 
-                    (ulong)aCurrent+sizeof(double), 
-                    (ulong)aCurrent+2*sizeof(double), 
-                    (ulong)aCurrent+3*sizeof(double));
+                vCurrent = Vector128.Create(
+                    (Int64)aCurrent, 
+                    (Int64)aCurrent+sizeof(double));
 
-                var vPrev = Vector256.Create(
-                    (ulong)aPrev, 
-                    (ulong)aPrev+sizeof(double), 
-                    (ulong)aPrev+2*sizeof(double), 
-                    (ulong)aPrev+3*sizeof(double));
+                var vPrev = Vector128.Create(
+                    (Int64)aPrev, 
+                    (Int64)aPrev+sizeof(double));
                 
-                var vShiftIndex = Vector256.Create(
-                    4*sizeof(double), 
-                    4*sizeof(double), 
-                    4*sizeof(double), 
-                    4*sizeof(double)
+                var vShiftIndex = Vector128.Create(
+                    2*sizeof(double), 
+                    2*sizeof(double)
                     );
 
                 while(aCurrent < aUnrolledEnd)
@@ -186,22 +142,8 @@ namespace SmoothingAlgorithms
 
                     #endregion
 
-                    #region  3
-
-                    //*aCurrent += *aPrev;
-                    *(double*)vCurrent.GetElement(2) += *(double*)vPrev.GetElement(2);
-
-                    #endregion
-
-                    #region  4
-
-                    //*aCurrent += *aPrev;
-                    *(double*)vCurrent.GetElement(3) += *(double*)vPrev.GetElement(3);
-
-                    #endregion 
-
-                    vCurrent = Avx.Add(vCurrent.AsDouble(), vShiftIndex.AsDouble()).AsUInt64();
-                    vPrev = Avx.Add(vPrev.AsDouble(), vShiftIndex.AsDouble()).AsUInt64();
+                    vCurrent = Avx.Add(vCurrent, vShiftIndex);
+                    vPrev = Avx.Add(vPrev, vShiftIndex);
                     aCurrent = (double*)vCurrent.GetElement(0);
                     aPrev = (double*)vPrev.GetElement(0);
                 }
