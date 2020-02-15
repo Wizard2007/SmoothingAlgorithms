@@ -3,7 +3,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace SmoothingAlgorithms
 {
-    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledAvx2 : CommonSmoothingAlgorithm
+    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledAvx : CommonSmoothingAlgorithm
     {
         public unsafe override double[] Applay(double[] values, int halfWindow)
         {
@@ -40,12 +40,12 @@ namespace SmoothingAlgorithms
                 {
                     #region  1
 
-                    Avx2.Store(
+                    Avx.Store(
                         aCurrent, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize) , 
-                                Avx2.LoadVector256(valueCurrent)),
+                        Avx.Divide(                           
+                            Avx.Subtract( 
+                                Avx.LoadVector256(valueWindowSize) , 
+                                Avx.LoadVector256(valueCurrent)),
                                 vWindowSize
                         )
                     );
@@ -54,12 +54,12 @@ namespace SmoothingAlgorithms
 
                     #region  2
 
-                    Avx2.Store(
+                    Avx.Store(
                         aCurrent + 4, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize + 4) , 
-                                Avx2.LoadVector256(valueCurrent + 4)),
+                        Avx.Divide(                           
+                            Avx.Subtract( 
+                                Avx.LoadVector256(valueWindowSize + 4) , 
+                                Avx.LoadVector256(valueCurrent + 4)),
                                 vWindowSize
                         )
                     );    
@@ -68,12 +68,12 @@ namespace SmoothingAlgorithms
 
                     #region  3
 
-                    Avx2.Store(
+                    Avx.Store(
                         aCurrent + 8, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize + 8) , 
-                                Avx2.LoadVector256(valueCurrent + 8)),
+                        Avx.Divide(                           
+                            Avx.Subtract( 
+                                Avx.LoadVector256(valueWindowSize + 8) , 
+                                Avx.LoadVector256(valueCurrent + 8)),
                                 vWindowSize
                         )
                     ); 
@@ -82,12 +82,12 @@ namespace SmoothingAlgorithms
 
                     #region  4
 
-                    Avx2.Store(
+                    Avx.Store(
                         aCurrent + 12, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize + 12) , 
-                                Avx2.LoadVector256(valueCurrent + 12)),
+                        Avx.Divide(                           
+                            Avx.Subtract( 
+                                Avx.LoadVector256(valueWindowSize + 12) , 
+                                Avx.LoadVector256(valueCurrent + 12)),
                                 vWindowSize
                         )
                     ); 
