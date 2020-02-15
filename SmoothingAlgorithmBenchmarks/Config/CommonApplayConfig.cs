@@ -15,6 +15,7 @@ namespace SmoothingAlgorithmBenchmarks.Configs
                     .With(Jit.RyuJit)
                     .With(Platform.X64)
                     .With(CsProjCoreToolchain.NetCoreApp31)
+                    .WithWarmupCount(10)
                     .WithInvocationCount(256)
             );
         }

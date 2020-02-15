@@ -1,3 +1,4 @@
+using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
 namespace SmoothingAlgorithms
@@ -34,8 +35,11 @@ namespace SmoothingAlgorithms
 
                 var valueWindowSize = valueStart + windowSize;
 
-                var pWindowSize = stackalloc double[4] {windowSize, windowSize, windowSize, windowSize};
-                var vWindowSize = Avx2.LoadVector256(pWindowSize);
+                var vWindowSize = Vector256.Create(
+                    (double)windowSize, 
+                    (double)windowSize, 
+                    (double)windowSize, 
+                    (double)windowSize);
 
                 while(aCurrent < aUnrolledEnd)
                 {

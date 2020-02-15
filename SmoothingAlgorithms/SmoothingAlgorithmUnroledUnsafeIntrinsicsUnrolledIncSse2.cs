@@ -3,8 +3,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace SmoothingAlgorithms
 {
-
-    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledIncAvx : CommonSmoothingAlgorithm
+    public class SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledIncSse2 : CommonSmoothingAlgorithm
     {
         public unsafe override double[] Applay(double[] values, int halfWindow)
         {
@@ -43,28 +42,28 @@ namespace SmoothingAlgorithms
 
                 var vCurrent = Vector256.Create(
                     (ulong)aCurrent, 
-                    (ulong)aCurrent+4*sizeof(double), 
-                    (ulong)aCurrent+8*sizeof(double), 
-                    (ulong)aCurrent+12*sizeof(double));
+                    (ulong)aCurrent+sizeof(double), 
+                    (ulong)aCurrent+2*sizeof(double), 
+                    (ulong)aCurrent+3*sizeof(double));
 
                 var vValueCurrent = Vector256.Create(
                     (ulong)valueCurrent, 
+                    (ulong)valueCurrent+2*sizeof(double), 
                     (ulong)valueCurrent+4*sizeof(double), 
-                    (ulong)valueCurrent+8*sizeof(double), 
-                    (ulong)valueCurrent+12*sizeof(double));
+                    (ulong)valueCurrent+6*sizeof(double));
 
 
                 var vValueWindowSize = Vector256.Create(
                     (ulong)valueWindowSize, 
+                    (ulong)valueWindowSize+2*sizeof(double), 
                     (ulong)valueWindowSize+4*sizeof(double), 
-                    (ulong)valueWindowSize+8*sizeof(double), 
-                    (ulong)valueWindowSize+12*sizeof(double));                   
+                    (ulong)valueWindowSize+6*sizeof(double));                   
                 
                 var vShiftIndex1 = Vector256.Create(
-                    16*sizeof(double), 
-                    16*sizeof(double), 
-                    16*sizeof(double), 
-                    16*sizeof(double)
+                    8*sizeof(double), 
+                    8*sizeof(double), 
+                    8*sizeof(double), 
+                    8*sizeof(double)
                     );
 
                 while(aCurrent < aUnrolledEnd)

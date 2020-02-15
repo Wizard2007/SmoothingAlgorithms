@@ -34,7 +34,11 @@ namespace SmoothingAlgorithms
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
-                var vWindowSize = Vector256.Create(windowSize, windowSize, windowSize, windowSize).AsDouble();
+                                var vWindowSize = Vector256.Create(
+                    (double)windowSize, 
+                    (double)windowSize, 
+                    (double)windowSize, 
+                    (double)windowSize);
 
                 while(aCurrent < aUnrolledEnd)
                 {

@@ -35,13 +35,17 @@ namespace SmoothingAlgorithms
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
-                var vWindowSize = Vector256.Create(windowSize, windowSize, windowSize, windowSize).AsDouble();
+                var vWindowSize = Vector256.Create(
+                    (double)windowSize, 
+                    (double)windowSize, 
+                    (double)windowSize, 
+                    (double)windowSize);
 
                 var vCurrent = Vector256.Create(
                     (ulong)aCurrent, 
-                    (ulong)aCurrent+sizeof(double), 
-                    (ulong)aCurrent+2*sizeof(double), 
-                    (ulong)aCurrent+3*sizeof(double));
+                    (ulong)aCurrent+4*sizeof(double), 
+                    (ulong)aCurrent+8*sizeof(double), 
+                    (ulong)aCurrent+12*sizeof(double));
 
                 var vValueCurrent = Vector256.Create(
                     (ulong)valueCurrent, 
