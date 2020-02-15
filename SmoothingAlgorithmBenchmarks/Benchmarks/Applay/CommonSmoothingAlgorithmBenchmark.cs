@@ -38,7 +38,7 @@ namespace SmoothingAlgorithmBenchmarks
         #region Benchmarks
 
         [Benchmark]
-        public void RunApplay()
+        public virtual void  RunApplay()
             => _smoothingAlgorithm.Applay(_buffer, HalfWindow);
 
         #endregion

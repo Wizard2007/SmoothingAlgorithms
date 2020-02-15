@@ -13,7 +13,7 @@ namespace SmoothingAlgorithmBenchmarks
 
             BenchmarkRunner.Run(new[]{
                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowBenchmark), configApplay),
-                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnrolledBenchmark), configApplay),
+                //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnrolledBenchmark), configApplay),
                 //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnsafeBenchmark), configApplay),
                 //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnrolledBenchmark), configApplay),
                 //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnrolledUnsafeBenchmark), configApplay),
@@ -22,6 +22,8 @@ namespace SmoothingAlgorithmBenchmarks
                 //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledPPBenchmark), configApplay),
                 //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsAvx2Benchmark), configApplay),
                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledAvx2Benchmark), configApplay),
+                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledIncAvx2Benchmark), configApplay),
+                
                 //BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledPPAvx2Benchmark), configApplay),
                 
             });

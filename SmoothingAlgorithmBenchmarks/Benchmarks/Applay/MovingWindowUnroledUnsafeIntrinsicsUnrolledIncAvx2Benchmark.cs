@@ -4,11 +4,8 @@ using SmoothingAlgorithms;
 
 namespace SmoothingAlgorithmBenchmarks
 {
-
     [Config(typeof(CommonApplayConfig))]
-    public class MovingWindowBenchmark : CommonSmoothingAlgorithmBenchmark<SmoothingAlgorithmW>
+    public class MovingWindowUnroledUnsafeIntrinsicsUnrolledIncAvx2Benchmark : CommonSmoothingAlgorithmBenchmark<SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolledIncAvx2>
     {
-        [Benchmark(Baseline=true)]
-        public override void RunApplay() => base.RunApplay();
     }
 }
