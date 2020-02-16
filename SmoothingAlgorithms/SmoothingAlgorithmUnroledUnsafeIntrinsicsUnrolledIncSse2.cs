@@ -35,26 +35,14 @@ namespace SmoothingAlgorithms
                 valueCurrent = valueStart;
 
                 var valueWindowSize = valueStart + windowSize;
-                var vWindowSize = Vector128.Create(
-                    (double)windowSize, 
-                    (double)windowSize);
+                var vWindowSize = Vector128.Create((double)windowSize);
+                var shift2D = Vector128.Create(0, 2*sizeof(double));
 
-                Vector128<Int64> vCurrent = Vector128.Create(
-                    (Int64)aCurrent, 
-                    (Int64)aCurrent+2*sizeof(double));
-
-                var vValueCurrent = Vector128.Create(
-                    (Int64)valueCurrent, 
-                    (Int64)valueCurrent+2*sizeof(double));
-
-
-                var vValueWindowSize = Vector128.Create(
-                    (Int64)valueWindowSize, 
-                    (Int64)valueWindowSize+2*sizeof(double));                   
+                var vCurrent = Sse2.Add(Vector128.Create((Int64)aCurrent), shift2D);
+                var vValueCurrent = Sse2.Add(Vector128.Create((Int64)valueCurrent), shift2D);
+                var vValueWindowSize = Sse2.Add(Vector128.Create((Int64)valueWindowSize), shift2D);
                 
-                var vShiftIndex1 = Vector128.Create(
-                    4*sizeof(double), 
-                    4*sizeof(double));
+                var vShiftIndex = Vector128.Create((Int64)4*sizeof(double));
 
                 while(aCurrent < aUnrolledEnd)
                 {
@@ -64,8 +52,8 @@ namespace SmoothingAlgorithms
                         aCurrent, 
                         Sse2.Divide(                           
                             Sse2.Subtract( 
-                                Sse2.LoadVector128(valueWindowSize) , 
-                                Sse2.LoadVector128(valueCurrent)),
+                                Sse2.LoadVector128((double*)vValueWindowSize.GetElement(0)) , 
+                                Sse2.LoadVector128((double*)vValueCurrent.GetElement(0))),
                                 vWindowSize
                         )
                     );
@@ -86,67 +74,62 @@ namespace SmoothingAlgorithms
 
                     #endregion
 
-                    vCurrent = Sse41.Add(vCurrent,vShiftIndex1);
-                    vValueCurrent = Sse2.Add(vValueCurrent,vShiftIndex1);
-                    vValueWindowSize = Sse2.Add(vValueWindowSize,vShiftIndex1);
+                    vCurrent = Sse2.Add(vCurrent,vShiftIndex);
+                    vValueCurrent = Sse2.Add(vValueCurrent,vShiftIndex);
+                    vValueWindowSize = Sse2.Add(vValueWindowSize,vShiftIndex);
 
-                    valueWindowSize = (double*)vValueWindowSize.GetElement(0);
-                    valueCurrent = (double*)vValueCurrent.GetElement(0);
                     aCurrent = (double*)vCurrent.GetElement(0);
                 }
 
+                valueWindowSize = (double*)vValueWindowSize.GetElement(0);
+                valueCurrent = (double*)vValueCurrent.GetElement(0);
+
                 while(aCurrent < aEnd)
                 {
-                    *aCurrent = (*valueWindowSize - *valueCurrent) /windowSize;
+                    *aCurrent = (*valueWindowSize - *valueCurrent) / windowSize;
                     aCurrent++;
                     valueCurrent++;
                     valueWindowSize++;
                 }
 
                 var aPrev = aStart;
+
                 aCurrent = aStart + 1;
                 aEnd = aStart + resultSize;
 
                 *aPrev = sum / windowSize;
 
-                aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2);
-                //var s = sizeof(double*);
-                //var addr = (long)aCurrent;
-                vCurrent = Vector128.Create(
-                    (Int64)aCurrent, 
-                    (Int64)aCurrent+sizeof(double));
+                aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2); 
 
-                var vPrev = Vector128.Create(
-                    (Int64)aPrev, 
-                    (Int64)aPrev+sizeof(double));
-                
-                var vShiftIndex = Vector128.Create(
-                    2*sizeof(double), 
-                    2*sizeof(double)
-                    );
+                var shift1D = Vector128.Create(0, sizeof(double));
+
+                vCurrent = Sse2.Add(Vector128.Create((Int64)aCurrent), shift1D);
+
+                var vPrev = Sse2.Add(Vector128.Create((Int64)aPrev), shift1D);
+
+                vShiftIndex = Vector128.Create((Int64)2*sizeof(double));
 
                 while(aCurrent < aUnrolledEnd)
                 {
                     #region  1
 
-                    //*aCurrent += *aPrev;
-                    *aCurrent += *aPrev;
-                    aPrev++;
+                    *aCurrent += *(double*)vPrev.GetElement(0);
 
                     #endregion
 
                     #region  2
 
-                    //*aCurrent += *aPrev;
                     *(double*)vCurrent.GetElement(1) += *(double*)vPrev.GetElement(1);
 
                     #endregion
 
                     vCurrent = Avx.Add(vCurrent, vShiftIndex);
                     vPrev = Avx.Add(vPrev, vShiftIndex);
+
                     aCurrent = (double*)vCurrent.GetElement(0);
-                    aPrev = (double*)vPrev.GetElement(0);
                 }
+
+                aPrev = (double*)vPrev.GetElement(0);
 
                 while(aCurrent < aEnd)
                 {
