@@ -15,10 +15,12 @@ namespace SmoothingAlgorithmBenchmarks
 
             BenchmarkRunner.Run(new[]{
                 #region Simple implementation
+                
+                BenchmarkConverter.TypeToBenchmarks(typeof(MathNetBenchmark), configApplay),
 
-                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowBenchmark), configApplay),
+/*                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowBenchmark), configApplay),
                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnrolledBenchmark), configApplay),
-
+ */
                 #endregion
 
                 #region Unsafe code
@@ -32,16 +34,16 @@ namespace SmoothingAlgorithmBenchmarks
 
 /*                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnrolledUnsafeIntrinsicsBenchmark), configApplay),
                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledBenchmark), configApplay),
-                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledPPBenchmark), configApplay), */
-                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledIncSse2Benchmark), configApplay),
+                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledPPBenchmark), configApplay), 
+                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledIncSse2Benchmark), configApplay),*/
 
                 #endregion
 
                 #region Avx
 
-                BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledAvxBenchmark), configApplay),
+/*                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledAvxBenchmark), configApplay),
                 BenchmarkConverter.TypeToBenchmarks(typeof(MovingWindowUnroledUnsafeIntrinsicsUnrolledIncAvxBenchmark), configApplay), 
-                
+ */                
                 #endregion
 
                 #region Avx2

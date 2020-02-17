@@ -8,10 +8,20 @@ namespace SmoothingAlgorithm.UnitTests
     [TestClass]
     public class CommonSmoothingAlgorithmTests<T> where T : CommonSmoothingAlgorithm, new()
     {
+        #region Private fields
+
         private T _smoothingAlgorithm;
+
+        #endregion
+
+        #region Test initializer
 
         public CommonSmoothingAlgorithmTests()
             => _smoothingAlgorithm = new T();
+
+        #endregion
+
+        #region Tests
 
         [DataTestMethod]
         [DynamicData(nameof(GetData), DynamicDataSourceType.Method)]
@@ -40,6 +50,7 @@ namespace SmoothingAlgorithm.UnitTests
                 2,
                 new double[] {3,4,5,6,7,6.2,5.4,4.6,3.8,3,4,5,6,7}
             };
+
 #region 6 - 10
 
 //6
@@ -194,6 +205,8 @@ namespace SmoothingAlgorithm.UnitTests
                 new double[] {3,4,5,6,7,6.2,5.4,4.6,3.8,3,4,5,6,7,6.6,6.4,6.4,6.6,7,9,11,13,15,17,19,16.6,14,11.2,8.2,4.8,5.8,7,8.4,10}
             };
 #endregion
+        
+        #endregion
         }
     }
 }
