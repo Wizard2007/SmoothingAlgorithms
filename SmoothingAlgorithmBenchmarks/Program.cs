@@ -11,7 +11,6 @@ namespace SmoothingAlgorithmBenchmarks
         static void Main(string[] args)
         {
             var configApplay =  CommonApplayConfig.Create(DefaultConfig.Instance);
-            //BenchmarkRunner.Run<LoadStoreIntinsicBenchmark>();
 
             BenchmarkRunner.Run(new[]{
                 #region Simple implementation
