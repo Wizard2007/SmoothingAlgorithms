@@ -13,16 +13,16 @@ namespace SmoothingAlgorithms
 
             if (resultSize == 0) return null;
 
-            var a = new double[resultSize];            
+            var a = new double[resultSize];
             var sum = 0d;
 
-            fixed(double* valueStart = values, aStart = a)
+            fixed (double* valueStart = values, aStart = a)
             {
 
                 var valueCurrent = valueStart;
                 var valueEndwindowSize = valueCurrent + windowSize;
 
-                while(valueCurrent < valueEndwindowSize)
+                while (valueCurrent < valueEndwindowSize)
                 {
                     sum += *valueCurrent;
                     valueCurrent++;
@@ -36,23 +36,23 @@ namespace SmoothingAlgorithms
 
                 var valueWindowSize = valueStart + windowSize;
                 var vWindowSize = Vector128.Create((double)windowSize);
-                var shift2D = Vector128.Create(0, 2*sizeof(double));
+                var shift2D = Vector128.Create(0, 2 * sizeof(double));
 
                 var vCurrent = Sse2.Add(Vector128.Create((Int64)aCurrent), shift2D);
                 var vValueCurrent = Sse2.Add(Vector128.Create((Int64)valueCurrent), shift2D);
                 var vValueWindowSize = Sse2.Add(Vector128.Create((Int64)valueWindowSize), shift2D);
-                
-                var vShiftIndex = Vector128.Create((Int64)4*sizeof(double));
 
-                while(aCurrent < aUnrolledEnd)
+                var vShiftIndex = Vector128.Create((Int64)4 * sizeof(double));
+
+                while (aCurrent < aUnrolledEnd)
                 {
                     #region  1
 
                     Sse2.Store(
-                        aCurrent, 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128((double*)vValueWindowSize.GetElement(0)) , 
+                        aCurrent,
+                        Sse2.Divide(
+                            Sse2.Subtract(
+                                Sse2.LoadVector128((double*)vValueWindowSize.GetElement(0)),
                                 Sse2.LoadVector128((double*)vValueCurrent.GetElement(0))),
                                 vWindowSize
                         )
@@ -63,20 +63,20 @@ namespace SmoothingAlgorithms
                     #region  2
 
                     Sse2.Store(
-                        (double*)vCurrent.GetElement(1), 
-                        Sse2.Divide(                           
-                            Sse2.Subtract( 
-                                Sse2.LoadVector128((double*)vValueWindowSize.GetElement(1)) , 
+                        (double*)vCurrent.GetElement(1),
+                        Sse2.Divide(
+                            Sse2.Subtract(
+                                Sse2.LoadVector128((double*)vValueWindowSize.GetElement(1)),
                                 Sse2.LoadVector128((double*)vValueCurrent.GetElement(1))),
                                 vWindowSize
                         )
-                    );    
+                    );
 
                     #endregion
 
-                    vCurrent = Sse2.Add(vCurrent,vShiftIndex);
-                    vValueCurrent = Sse2.Add(vValueCurrent,vShiftIndex);
-                    vValueWindowSize = Sse2.Add(vValueWindowSize,vShiftIndex);
+                    vCurrent = Sse2.Add(vCurrent, vShiftIndex);
+                    vValueCurrent = Sse2.Add(vValueCurrent, vShiftIndex);
+                    vValueWindowSize = Sse2.Add(vValueWindowSize, vShiftIndex);
 
                     aCurrent = (double*)vCurrent.GetElement(0);
                 }
@@ -84,7 +84,7 @@ namespace SmoothingAlgorithms
                 valueWindowSize = (double*)vValueWindowSize.GetElement(0);
                 valueCurrent = (double*)vValueCurrent.GetElement(0);
 
-                while(aCurrent < aEnd)
+                while (aCurrent < aEnd)
                 {
                     *aCurrent = (*valueWindowSize - *valueCurrent) / windowSize;
                     aCurrent++;
@@ -99,7 +99,7 @@ namespace SmoothingAlgorithms
 
                 *aPrev = sum / windowSize;
 
-                aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2); 
+                aUnrolledEnd = aStart + (((resultSize - 1) >> 2) << 2);
 
                 var shift1D = Vector128.Create(0, sizeof(double));
 
@@ -107,9 +107,9 @@ namespace SmoothingAlgorithms
 
                 var vPrev = Sse2.Add(Vector128.Create((Int64)aPrev), shift1D);
 
-                vShiftIndex = Vector128.Create((Int64)2*sizeof(double));
+                vShiftIndex = Vector128.Create((Int64)2 * sizeof(double));
 
-                while(aCurrent < aUnrolledEnd)
+                while (aCurrent < aUnrolledEnd)
                 {
                     #region  1
 
@@ -131,7 +131,7 @@ namespace SmoothingAlgorithms
 
                 aPrev = (double*)vPrev.GetElement(0);
 
-                while(aCurrent < aEnd)
+                while (aCurrent < aEnd)
                 {
                     *aCurrent += *aPrev;
                     aCurrent++;

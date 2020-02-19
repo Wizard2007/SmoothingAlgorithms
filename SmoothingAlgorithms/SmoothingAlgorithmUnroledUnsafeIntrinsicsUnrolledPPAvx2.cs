@@ -13,15 +13,15 @@ namespace SmoothingAlgorithms
             if (resultSize == 0) return null;
 
             var a = new double[resultSize];
-            
+
             var sum = 0d;
-            fixed(double* valueStart = values, aStart = a)
+            fixed (double* valueStart = values, aStart = a)
             {
 
                 var valueCurrent = valueStart;
                 var valueEndwindowSize = valueCurrent + windowSize;
 
-                while(valueCurrent < valueEndwindowSize)
+                while (valueCurrent < valueEndwindowSize)
                 {
                     sum += *(valueCurrent++);
                 }
@@ -36,19 +36,19 @@ namespace SmoothingAlgorithms
                 var valueWindowSize = valueStart + windowSize;
 
                 var vWindowSize = Vector256.Create(
-                    (double)windowSize, 
-                    (double)windowSize, 
-                    (double)windowSize, 
+                    (double)windowSize,
+                    (double)windowSize,
+                    (double)windowSize,
                     (double)windowSize);
 
-                while(aCurrent < aUnrolledEnd)
+                while (aCurrent < aUnrolledEnd)
                 {
                     // 1
                     Avx2.Store(
-                        aCurrent, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize) , 
+                        aCurrent,
+                        Avx2.Divide(
+                            Avx2.Subtract(
+                                Avx2.LoadVector256(valueWindowSize),
                                 Avx2.LoadVector256(valueCurrent)),
                                 vWindowSize
                         )
@@ -56,45 +56,45 @@ namespace SmoothingAlgorithms
 
                     // 2
                     Avx2.Store(
-                        aCurrent + 4, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize + 4) , 
+                        aCurrent + 4,
+                        Avx2.Divide(
+                            Avx2.Subtract(
+                                Avx2.LoadVector256(valueWindowSize + 4),
                                 Avx2.LoadVector256(valueCurrent + 4)),
                                 vWindowSize
                         )
-                    );    
+                    );
 
                     // 3
                     Avx2.Store(
-                        aCurrent + 8, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize + 8) , 
+                        aCurrent + 8,
+                        Avx2.Divide(
+                            Avx2.Subtract(
+                                Avx2.LoadVector256(valueWindowSize + 8),
                                 Avx2.LoadVector256(valueCurrent + 8)),
                                 vWindowSize
                         )
-                    ); 
+                    );
 
                     // 4
                     Avx2.Store(
-                        aCurrent + 12, 
-                        Avx2.Divide(                           
-                            Avx2.Subtract( 
-                                Avx2.LoadVector256(valueWindowSize + 12) , 
+                        aCurrent + 12,
+                        Avx2.Divide(
+                            Avx2.Subtract(
+                                Avx2.LoadVector256(valueWindowSize + 12),
                                 Avx2.LoadVector256(valueCurrent + 12)),
                                 vWindowSize
                         )
-                    ); 
+                    );
 
                     valueWindowSize += 16;
                     valueCurrent += 16;
                     aCurrent += 16;
                 }
 
-                while(aCurrent < aEnd)
+                while (aCurrent < aEnd)
                 {
-                    *(aCurrent++) = (*(valueWindowSize++) - *(valueCurrent++)) /windowSize;
+                    *(aCurrent++) = (*(valueWindowSize++) - *(valueCurrent++)) / windowSize;
                 }
 
                 var aPrev = aStart;
@@ -105,7 +105,7 @@ namespace SmoothingAlgorithms
 
                 aUnrolledEnd = aStart + (((resultSize - 1) >> 1) << 1);
 
-                while(aCurrent < aUnrolledEnd)
+                while (aCurrent < aUnrolledEnd)
                 {
                     // 1
                     *(aCurrent++) += *(aPrev++);
@@ -114,7 +114,7 @@ namespace SmoothingAlgorithms
                     *(aCurrent++) += *(aPrev++);
                 }
 
-                while(aCurrent < aEnd)
+                while (aCurrent < aEnd)
                 {
                     *(aCurrent++) += *(aPrev++);
                 }

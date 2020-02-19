@@ -7,6 +7,5 @@ namespace SmoothingAlgorithmBenchmarks
     [Config(typeof(CommonApplayConfig))]
     public class MovingWindowUnsafeBenchmark : CommonSmoothingAlgorithmBenchmark<SmoothingAlgorithmUnsafe>
     {
-
     }
 }

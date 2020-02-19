@@ -5,5 +5,5 @@ namespace SmoothingAlgorithm.UnitTests
 {
     [TestClass]
     public class SmoothingAlgorithmUnroledUnsafeIntrinsicsAvx2Tests : CommonSmoothingAlgorithmTests<SmoothingAlgorithmUnroledUnsafeIntrinsicsAvx2>
-    {}
+    { }
 }

@@ -7,7 +7,7 @@ namespace SmoothingAlgorithms
     {
         public unsafe override double[] Applay(double[] values, int halfWindow)
         {
-            var result =  Statistics.MovingAverage(values, 2*halfWindow + 1);
+            var result = Statistics.MovingAverage(values, 2 * halfWindow + 1);
             return result.ToArray();
         }
     }

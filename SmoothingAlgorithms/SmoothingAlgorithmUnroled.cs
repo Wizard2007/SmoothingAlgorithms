@@ -11,7 +11,7 @@ namespace SmoothingAlgorithms
             if (resultSize == 0) return null;
 
             var a = new double[resultSize];
-            
+
             var sum = 0d;
 
             for (var i = 0; i < windowSize; i++)
@@ -22,7 +22,7 @@ namespace SmoothingAlgorithms
             a[0] = sum;
 
             var resultSizeUnroled = ((resultSize - 1) >> 2) << 2;
-            for (var i = 1; i < resultSizeUnroled; )
+            for (var i = 1; i < resultSizeUnroled;)
             {
                 var index = i - 1;
                 a[i] = a[index] - values[index] + values[index + windowSize];
@@ -45,7 +45,7 @@ namespace SmoothingAlgorithms
                 i++;
             }
 
-            for (var i = resultSizeUnroled + 1; i < resultSize; )
+            for (var i = resultSizeUnroled + 1; i < resultSize;)
             {
                 var index = i - 1;
                 a[i] = a[index] - values[index] + values[index + windowSize];
@@ -54,7 +54,7 @@ namespace SmoothingAlgorithms
             }
 
             a[resultSize - 1] /= (windowSize);
-            
+
 
             return a;
         }

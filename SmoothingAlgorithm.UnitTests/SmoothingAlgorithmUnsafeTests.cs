@@ -6,6 +6,5 @@ namespace SmoothingAlgorithm.UnitTests
     [TestClass]
     public class SmoothingAlgorithmUnsafeTests : CommonSmoothingAlgorithmTests<SmoothingAlgorithmUnsafe>
     {
-
     }
 }

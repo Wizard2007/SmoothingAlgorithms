@@ -4,7 +4,7 @@ using SmoothingAlgorithms;
 
 namespace SmoothingAlgorithmBenchmarks
 {
-    public abstract class CommonSmoothingAlgorithmBenchmark<T> where T: CommonSmoothingAlgorithm, new()
+    public abstract class CommonSmoothingAlgorithmBenchmark<T> where T : CommonSmoothingAlgorithm, new()
     {
         #region Private fields
 
@@ -20,7 +20,7 @@ namespace SmoothingAlgorithmBenchmarks
 
         public IEnumerable<int> Buffers => new[] { /*2800, 3500, 28000, 35000,*/ 280000, 350000 };
 
-        
+
         [ParamsSource(nameof(HalfWindows))]
         public int HalfWindow { get; set; }
 
@@ -38,7 +38,7 @@ namespace SmoothingAlgorithmBenchmarks
         #region Benchmarks
 
         [Benchmark]
-        public virtual void  RunApplay()
+        public virtual void RunApplay()
             => _smoothingAlgorithm.Applay(_buffer, HalfWindow);
 
         #endregion
@@ -50,7 +50,7 @@ namespace SmoothingAlgorithmBenchmarks
         {
             _buffer = new double[N];
 
-            for(var i = 0; i < _buffer.Length; i++)
+            for (var i = 0; i < _buffer.Length; i++)
             {
                 _buffer[i] = 1;
             }

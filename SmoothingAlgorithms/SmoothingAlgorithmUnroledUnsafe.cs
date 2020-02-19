@@ -10,14 +10,14 @@ namespace SmoothingAlgorithms
             if (resultSize == 0) return null;
 
             var a = new double[resultSize];
-            
+
             var sum = 0d;
-            fixed(double* valueStart = values, aStart = a)
+            fixed (double* valueStart = values, aStart = a)
             {
 
                 var valueCurrent = valueStart;
                 var valueEndwindowSize = valueCurrent + windowSize;
-                while(valueCurrent < valueEndwindowSize)
+                while (valueCurrent < valueEndwindowSize)
                 {
                     sum += *valueCurrent;
                     valueCurrent++;
@@ -36,7 +36,7 @@ namespace SmoothingAlgorithms
 
                 var valueWindowSize = valueStart + windowSize;
 
-                while(aCurrent < aUnrolledEnd)
+                while (aCurrent < aUnrolledEnd)
                 {
                     // 1
                     *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
@@ -71,7 +71,7 @@ namespace SmoothingAlgorithms
                     valueWindowSize++;
                 }
 
-                while(aCurrent < aEnd)
+                while (aCurrent < aEnd)
                 {
                     *aCurrent = *aPrev - *valueCurrent + *valueWindowSize;
                     *aPrev /= windowSize;

@@ -8,7 +8,7 @@ namespace SmoothingAlgorithmBenchmarks
     [Config(typeof(CommonApplayConfig))]
     public class MovingWindowBenchmark : CommonSmoothingAlgorithmBenchmark<SmoothingAlgorithmW>
     {
-        [Benchmark(Baseline=true)]
+        [Benchmark(Baseline = true)]
         public override void RunApplay() => base.RunApplay();
     }
 }
