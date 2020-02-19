@@ -1,14 +1,14 @@
 ﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
+#if (!DEBUG)
+using SmoothingAlgorithmBenchmarks.Configs;
+#endif 
 
 namespace SmoothingAlgorithmBenchmarks
 {
     class Program
     {
-#if (DEBUG)
-        static void Main(string[] args) 
-            => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
-#else
+#if (!DEBUG)
         static void Main(string[] args)
         {
             var configApplay =  CommonApplayConfig.Create(DefaultConfig.Instance);
@@ -57,7 +57,10 @@ namespace SmoothingAlgorithmBenchmarks
                 
             });
         }
-    }
+
+#else
+        static void Main(string[] args) 
+            => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
 #endif
     }
 }
