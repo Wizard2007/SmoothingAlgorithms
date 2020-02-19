@@ -7,6 +7,5 @@ namespace SmoothingAlgorithm.UnitTests
     [TestClass]
     public class SmoothingAlgorithmWTests : CommonSmoothingAlgorithmTests<SmoothingAlgorithmW>
     {
-
     }
 }

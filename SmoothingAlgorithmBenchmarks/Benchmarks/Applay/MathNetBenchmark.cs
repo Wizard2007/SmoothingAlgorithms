@@ -7,7 +7,7 @@ namespace SmoothingAlgorithmBenchmarks
     [Config(typeof(CommonApplayConfig))]
     public class MathNetBenchmark : CommonSmoothingAlgorithmBenchmark<SmoothingAlgorithmW>
     {
-        [Benchmark(Baseline=true)]
+        [Benchmark(Baseline = true)]
         public override void RunApplay() => base.RunApplay();
     }
 }

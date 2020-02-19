@@ -4,7 +4,6 @@ using SmoothingAlgorithms;
 
 namespace SmoothingAlgorithmBenchmarks
 {
-
     [Config(typeof(CommonApplayConfig))]
     public class MovingWindowUnroledUnsafeIntrinsicsUnrolledBenchmark : CommonSmoothingAlgorithmBenchmark<SmoothingAlgorithmUnroledUnsafeIntrinsicsUnrolled>
     {
